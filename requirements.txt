@@ -1,0 +1,7 @@
+streamlit
+streamlit_option_menu
+altair
+pandas
+numpy
+matplotlib
+seaborn
