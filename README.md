@@ -1,1 +1,1 @@
-# Hexopod-Kinematic-Simulator
+# Hexapod-Kinematic-Simulator
