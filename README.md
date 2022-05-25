@@ -3,5 +3,5 @@
 
 ### Deploy Streamlit App
 
-[![Streamlit App](<img src="HMB.png" alt="HMB" width="200"/>)](https://share.streamlit.io/m-ghodrat/hexopod-kinematic-simulator/main/HexapodKinematicSimulator.py)
+[![Streamlit App](<./HMB.png | width=100)](https://share.streamlit.io/m-ghodrat/hexopod-kinematic-simulator/main/HexapodKinematicSimulator.py)
 
