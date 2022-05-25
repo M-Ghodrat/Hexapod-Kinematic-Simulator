@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 # Hexapod-Kinematic-Simulator
 
 ### Deploy Streamlit App
