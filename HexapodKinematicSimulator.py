@@ -432,40 +432,113 @@ if selected == 'Results':
     initial_ = initial_.rename(index={0: 'actuator 1', 1: 'actuator 2', 2: 'actuator 3', 3: 'actuator 4', 4: 'actuator 5', 5: 'actuator 6'})
 
     if toggle == "Actuator's initial length":
+        
+        fig = plt.figure(figsize= (10,5)) 
+        ax = fig.add_subplot(111)
+        ax.bar(initial_.index, initial_["Actuator's initial length (in)"]*0+st.session_state.maxL_new/st.session_state.unit, color='lightgreen')
+        pp = ax.bar(initial_.index, initial_["Actuator's initial length (in)"], color='lightcoral')
+        ax.bar(initial_.index, initial_["Actuator's initial length (in)"]*0+st.session_state.minL_new/st.session_state.unit, color='white')
+        ax.set_ylim([0.98*st.session_state.minL_new/st.session_state.unit,1.02*st.session_state.maxL_new/st.session_state.unit])
+        for value in pp:
+            height = value.get_height()
+            ax.text(value.get_x() + value.get_width()/2., 1*height,'%d' % float((height-st.session_state.minL_new/st.session_state.unit)/(st.session_state.maxL_new/st.session_state.unit-st.session_state.minL_new/st.session_state.unit)*100) +'%', ha='center', va='bottom', fontsize=20)
+        st.pyplot(fig)
+            
+#         if st.session_state.disp_unit_new == 'Inches':
+#             fig = plt.figure(figsize= (10,5)) 
+#             ax = fig.add_subplot(111)
+#             ax.bar(initial_.index, initial_["Actuator's initial length (in)"]*0+st.session_state.maxL_new/st.session_state.unit, color='lightgreen')
+#             pp = ax.bar(initial_.index, initial_["Actuator's initial length (in)"], color='lightcoral')
+#             ax.bar(initial_.index, initial_["Actuator's initial length (in)"]*0+st.session_state.minL_new/st.session_state.unit, color='white')
+#             ax.set_ylim([0.98*st.session_state.minL_new/st.session_state.unit,1.02*st.session_state.maxL_new/st.session_state.unit])
+#             for value in pp:
+#                 height = value.get_height()
+#                 ax.text(value.get_x() + value.get_width()/2., 1*height,'%d' % float((height-st.session_state.minL_new/st.session_state.unit)/(st.session_state.maxL_new/st.session_state.unit-st.session_state.minL_new/st.session_state.unit)*100) +'%', ha='center', va='bottom', fontsize=20)
+#             st.pyplot(fig)
+#         else:
+#             fig = plt.figure(figsize= (10,5)) 
+#             ax = fig.add_subplot(111)
+#             ax.bar(initial.index, initial["Actuator's initial length (cm)"]*0+st.session_state.maxL_new, color='lightgreen')
+#             pp = ax.bar(initial.index, initial["Actuator's initial length (cm)"], color='lightcoral')
+#             ax.bar(initial.index, initial["Actuator's initial length (cm)"]*0+st.session_state.minL_new, color='white')
+#             ax.set_ylim([0.98*st.session_state.minL_new,1.02*st.session_state.maxL_new])
+#             for value in pp:
+#                 height = value.get_height()
+#                 ax.text(value.get_x() + value.get_width()/2., 1*height,'%d' % float((height-st.session_state.minL_new)/(st.session_state.maxL_new-st.session_state.minL_new)*100) +'%', ha='center', va='bottom', fontsize=20)
+#             st.pyplot(fig) 
+            
         if st.session_state.disp_unit_new == 'Inches':  
             initial_ = initial_.style.set_properties(**{'text-align': 'center'})
             initial_ = initial_.set_table_styles([cell_hover, index_names, headers]) 
             initial_ = initial_.format({"Actuator's initial length (in)": "{}"})
+          
             st.dataframe(initial_)
+            
         else:
             initial = initial.style.set_properties(**{'text-align': 'center'})
             initial_new = initial.set_table_styles([cell_hover, index_names, headers])
             initial_new = initial_new.format({"Actuator's initial length (cm)": "{}"})
+           
             st.dataframe(initial_new)
-    
+        
     elif toggle == "Admissible displacements ranges":
-        if st.session_state.disp_unit_new == 'Inches':
-            fig = plt.figure(figsize= (10,5)) 
-            ax = fig.add_subplot(111)
-            ax.bar(initial_.index, initial_["Actuator's initial length (in)"]*0+st.session_state.maxL_new/st.session_state.unit, color='lightgreen')
-            pp = ax.bar(initial_.index, initial_["Actuator's initial length (in)"], color='lightcoral')
-            ax.bar(initial_.index, initial_["Actuator's initial length (in)"]*0+st.session_state.minL_new/st.session_state.unit, color='white')
-            ax.set_ylim([0.98*st.session_state.minL_new/st.session_state.unit,1.02*st.session_state.maxL_new/st.session_state.unit])
-            for value in pp:
-                height = value.get_height()
-                ax.text(value.get_x() + value.get_width()/2., 1*height,'%d' % float((height-st.session_state.minL_new/st.session_state.unit)/(st.session_state.maxL_new/2.54-st.session_state.minL_new/st.session_state.unit)*100) +'%', ha='center', va='bottom', fontsize=20)
-            st.pyplot(fig)
-        else:
-            fig = plt.figure(figsize= (10,5)) 
-            ax = fig.add_subplot(111)
-            ax.bar(initial.index, initial["Actuator's initial length (cm)"]*0+st.session_state.maxL_new, color='lightgreen')
-            pp = ax.bar(initial.index, initial["Actuator's initial length (cm)"], color='lightcoral')
-            ax.bar(initial.index, initial["Actuator's initial length (cm)"]*0+st.session_state.minL_new, color='white')
-            ax.set_ylim([0.98*st.session_state.minL_new,1.02*st.session_state.maxL_new])
-            for value in pp:
-                height = value.get_height()
-                ax.text(value.get_x() + value.get_width()/2., 1*height,'%d' % float((height-st.session_state.minL_new)/(st.session_state.maxL_new-st.session_state.minL_new)*100) +'%', ha='center', va='bottom', fontsize=20)
-            st.pyplot(fig) 
+
+        ################
+        
+        value_final = np.array([[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]])
+        dict_modes = {'surge':0, 'sway':1, 'heave':2, 'roll':3, 'pitch':4, 'yaw':5}
+        dict_increment = {'min':0, 'max':1}
+        act_len = np.zeros((6,6,2))
+
+        PIV = np.array([[st.session_state.pivot_x], [st.session_state.pivot_y], [-st.session_state.pivot_z]])
+        PIV_ext = np.array([[st.session_state.pivot_x], [st.session_state.pivot_y], [st.session_state.pivot_z]]).repeat(len(u_s[0]), axis=0).reshape(-1,len(u_s[0]))
+
+        u_s_new = u_s - PIV_ext
+
+        for j in dict_increment.keys():
+
+            if j == 'min':
+                increment = -0.1
+            else:
+                increment = +0.1
+
+            for i in dict_modes.keys():
+
+                flag = True
+                value = np.array([[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]])
+
+                while flag == True:
+
+                    linears = np.array([[value[dict_modes['surge']][dict_increment[j]]], [value[dict_modes['sway']][dict_increment[j]]], [-value[dict_modes['heave']][dict_increment[j]]]])
+                    angles = np.array([[value[dict_modes['roll']][dict_increment[j]]], [value[dict_modes['pitch']][dict_increment[j]]], [value[dict_modes['yaw']][dict_increment[j]]]])
+    #                 r_si = np.array([r_si_0[0], r_si_0[1], -r_si_0[2]]) + PIV + linears
+                    r_si = r_si_0 + PIV + linears
+                    actuator_lengths = np.array(actuator_length(angles, u_s_new, b_i, r_si))/st.session_state.unit
+
+                    if (actuator_lengths.min() > st.session_state.minL_new/st.session_state.unit) & (actuator_lengths.max() < st.session_state.maxL_new/st.session_state.unit):
+                        value[dict_modes[i]][dict_increment[j]] += increment
+                    else:
+                        flag = False   
+
+                act_len[:,dict_modes[i],dict_increment[j]] = actuator_lengths
+                value[dict_modes[i]][dict_increment[j]] -= increment
+
+                value_final[dict_modes[i]][dict_increment[j]] = value[dict_modes[i]][dict_increment[j]]
+
+        for i in range(6):
+            if i < 3:
+                value_final[i] = value_final[i]#*100
+            else:
+                value_final[i] = value_final[i]*180/np.pi
+
+        value_final_new = value_final.copy()
+
+        value_final_new = np.round(value_final_new, 1)/st.session_state.unit
+        Admissible = pd.DataFrame(value_final_new, columns=['minimum range', 'maximum range'], index=['Surge', 'Sway', 'Heave', 'Roll', 'Pitch', 'Yaw'])
+        
+        st.dataframe(Admissible)
+        
+        ################
 
 def ResetMove():
     st.session_state.update({'surge_move': 0.0, 'sway_move': 0.0, 'heave_move': 0.0, 'roll_move': 0.0, 'pitch_move': 0.0, 'yaw_move': 0.0,})
@@ -647,7 +720,7 @@ if selected == 'Settings':
         st.session_state.disp_unit_flag = 'Inches'
     if st.session_state.disp_unit_new == 'Centimeters':
         if st.session_state.disp_unit_flag == 'Inches':
-            st.session_state.unit = 1.0/2.54
+            st.session_state.unit = 1.0#/2.54
         st.session_state.disp_unit_flag = 'Centimeters'  
     
     if st.session_state.rot_unit_new == 'Radians':
