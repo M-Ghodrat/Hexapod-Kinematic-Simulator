@@ -498,9 +498,9 @@ if selected == 'Results':
         for j in dict_increment.keys():
 
             if j == 'min':
-                increment = -0.1
+                increment = -0.005
             else:
-                increment = +0.1
+                increment = +0.005
 
             for i in dict_modes.keys():
 
