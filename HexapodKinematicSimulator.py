@@ -248,7 +248,7 @@ with st.sidebar:
     st.pyplot(fig)
     ####
     
-    uploaded_file = st.file_uploader("Choose a. XLSX file", accept_multiple_files=False)
+    uploaded_file = st.file_uploader("Choose a .XLSX file", accept_multiple_files=False)
     if uploaded_file is not None:
         df = pd.read_excel(uploaded_file)        
         ind_start_upper = df.index[(pd.Series((df.iloc[i,0] == 'UPPER FRAME' and df.iloc[i+1,0] == 'X')  for i in df.index))][0] + 2
