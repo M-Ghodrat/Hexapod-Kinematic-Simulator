@@ -178,118 +178,6 @@ def reset_geo():
     
 with st.sidebar:
     
-    angles = np.array([[0.0], [0.0], [0.0]])
-    linears = np.array([[0.0], [0.0], [0.0]])
-    angles_0 = angles.copy()
-    
-    b_i = np.array([[st.session_state['act1_lower_x_new'], 
-                     st.session_state['act2_lower_x_new'], 
-                     st.session_state['act3_lower_x_new'], 
-                     st.session_state['act4_lower_x_new'], 
-                     st.session_state['act5_lower_x_new'], 
-                     st.session_state['act6_lower_x_new']],
-                    [st.session_state['act1_lower_y_new'], 
-                     st.session_state['act2_lower_y_new'], 
-                     st.session_state['act3_lower_y_new'], 
-                     st.session_state['act4_lower_y_new'], 
-                     st.session_state['act5_lower_y_new'], 
-                     st.session_state['act6_lower_y_new']],
-                    [st.session_state['act1_lower_z_new'], 
-                     st.session_state['act2_lower_z_new'], 
-                     st.session_state['act3_lower_z_new'], 
-                     st.session_state['act4_lower_z_new'], 
-                     st.session_state['act5_lower_z_new'], 
-                     st.session_state['act6_lower_z_new']]])
-
-    u_s = np.array([[st.session_state['act1_upper_x_new'], 
-                     st.session_state['act2_upper_x_new'], 
-                     st.session_state['act3_upper_x_new'], 
-                     st.session_state['act4_upper_x_new'], 
-                     st.session_state['act5_upper_x_new'], 
-                     st.session_state['act6_upper_x_new']],
-                    [st.session_state['act1_upper_y_new'], 
-                     st.session_state['act2_upper_y_new'], 
-                     st.session_state['act3_upper_y_new'], 
-                     st.session_state['act4_upper_y_new'], 
-                     st.session_state['act5_upper_y_new'], 
-                     st.session_state['act6_upper_y_new']],
-                    [st.session_state['act1_upper_z_new'], 
-                     st.session_state['act2_upper_z_new'], 
-                     st.session_state['act3_upper_z_new'], 
-                     st.session_state['act4_upper_z_new'], 
-                     st.session_state['act5_upper_z_new'], 
-                     st.session_state['act6_upper_z_new']]])
-    
-    r_si_0 = np.array([[0], [0], [-st.session_state.dist_frame_new]])
-    r_si = r_si_0 + linears
-    
-    value_final = np.array([[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]])
-    dict_modes = {'surge':0, 'sway':1, 'heave':2, 'roll':3, 'pitch':4, 'yaw':5}
-    dict_increment = {'min':0, 'max':1}
-    act_len = np.zeros((6,6,2))
-
-    PIV = np.array([[st.session_state.pivot_x], [st.session_state.pivot_y], [-st.session_state.pivot_z]])
-    PIV_ext = np.array([[st.session_state.pivot_x], [st.session_state.pivot_y], [st.session_state.pivot_z]]).repeat(len(u_s[0]), axis=0).reshape(-1,len(u_s[0]))
-
-    u_s_new = u_s - PIV_ext
-
-    for j in dict_increment.keys():
-
-        if j == 'min':
-            increment = -0.1
-        else:
-            increment = +0.1
-
-        for i in dict_modes.keys():
-
-            if i in {'roll', 'pitch', 'yaw'}:
-                increment /= 10
-
-            flag = True
-            value = np.array([[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]])
-
-            while flag == True:
-
-                linears = np.array([[value[dict_modes['surge']][dict_increment[j]]], [value[dict_modes['sway']][dict_increment[j]]], [-value[dict_modes['heave']][dict_increment[j]]]])
-                angles = np.array([[value[dict_modes['roll']][dict_increment[j]]], [value[dict_modes['pitch']][dict_increment[j]]], [value[dict_modes['yaw']][dict_increment[j]]]])
-#                 r_si = np.array([r_si_0[0], r_si_0[1], -r_si_0[2]]) + PIV + linears
-                r_si = r_si_0 + PIV + linears
-                actuator_lengths = np.array(actuator_length(angles, u_s_new, b_i, r_si))/st.session_state.unit
-
-                if (actuator_lengths.min() > st.session_state.minL_new/st.session_state.unit) & (actuator_lengths.max() < st.session_state.maxL_new/st.session_state.unit):    
-                    value[dict_modes[i]][dict_increment[j]] += increment
-                else:
-                    flag = False   
-
-            act_len[:,dict_modes[i],dict_increment[j]] = actuator_lengths
-            value[dict_modes[i]][dict_increment[j]] -= increment
-
-            value_final[dict_modes[i]][dict_increment[j]] = value[dict_modes[i]][dict_increment[j]]
-
-    for i in range(6):
-        if i < 3:
-            value_final[i] = value_final[i]#*100
-        else:
-            value_final[i] = value_final[i]*180/np.pi
-
-    value_final_new = value_final.copy()
-
-    value_final_new = np.round(value_final_new, 1)/st.session_state.unit
-    Admissible = pd.DataFrame(value_final_new, columns=['minimum range', 'maximum range'], index=['Surge', 'Sway', 'Heave', 'Roll', 'Pitch', 'Yaw'])
-    
-    @st.cache
-    def convert_df(df):
-        return df.to_csv().encode('utf-8')
-    
-    csv = convert_df(Admissible)
-    st.download_button(
-        "Press to Download the Results",
-        csv,
-        "output.csv",
-        "text/csv",
-        key='download-csv'
-    )
-    
     uploaded_file = st.file_uploader("Choose a .XLSX file", accept_multiple_files=False)
     if uploaded_file is not None:
         df = pd.read_excel(uploaded_file)        
@@ -360,6 +248,75 @@ with st.sidebar:
             st.session_state[val] = st.session_state[val+'_new']
             
     ####
+    angles = np.array([[0.0], [0.0], [0.0]])
+    linears = np.array([[0.0], [0.0], [0.0]])
+    angles_0 = angles.copy()
+    
+    b_i = np.array([[st.session_state['act1_lower_x_new'], 
+                     st.session_state['act2_lower_x_new'], 
+                     st.session_state['act3_lower_x_new'], 
+                     st.session_state['act4_lower_x_new'], 
+                     st.session_state['act5_lower_x_new'], 
+                     st.session_state['act6_lower_x_new']],
+                    [st.session_state['act1_lower_y_new'], 
+                     st.session_state['act2_lower_y_new'], 
+                     st.session_state['act3_lower_y_new'], 
+                     st.session_state['act4_lower_y_new'], 
+                     st.session_state['act5_lower_y_new'], 
+                     st.session_state['act6_lower_y_new']],
+                    [st.session_state['act1_lower_z_new'], 
+                     st.session_state['act2_lower_z_new'], 
+                     st.session_state['act3_lower_z_new'], 
+                     st.session_state['act4_lower_z_new'], 
+                     st.session_state['act5_lower_z_new'], 
+                     st.session_state['act6_lower_z_new']]])
+
+    u_s = np.array([[st.session_state['act1_upper_x_new'], 
+                     st.session_state['act2_upper_x_new'], 
+                     st.session_state['act3_upper_x_new'], 
+                     st.session_state['act4_upper_x_new'], 
+                     st.session_state['act5_upper_x_new'], 
+                     st.session_state['act6_upper_x_new']],
+                    [st.session_state['act1_upper_y_new'], 
+                     st.session_state['act2_upper_y_new'], 
+                     st.session_state['act3_upper_y_new'], 
+                     st.session_state['act4_upper_y_new'], 
+                     st.session_state['act5_upper_y_new'], 
+                     st.session_state['act6_upper_y_new']],
+                    [st.session_state['act1_upper_z_new'], 
+                     st.session_state['act2_upper_z_new'], 
+                     st.session_state['act3_upper_z_new'], 
+                     st.session_state['act4_upper_z_new'], 
+                     st.session_state['act5_upper_z_new'], 
+                     st.session_state['act6_upper_z_new']]])
+    
+    r_si_0 = np.array([[0], [0], [-st.session_state.dist_frame_new]])
+    r_si = r_si_0 + linears
+    fig = plt.figure(figsize=(5,5))
+    ax = plt.axes(projection='3d')
+#     ax._axis3don = False
+    
+    plot3d_x_lim_min = round(min(min(u_s[0,:])+r_si_0[0][0],min(b_i[0,:])),2)*1.15
+    plot3d_x_lim_max = round(max(max(u_s[0,:])+r_si_0[0][0],max(b_i[0,:])),2)*1.15
+    plot3d_y_lim_min = round(min(min(u_s[1,:])+r_si_0[1][0],min(b_i[1,:])),2)*1.15
+    plot3d_y_lim_max = round(max(max(u_s[1,:])+r_si_0[1][0],max(b_i[1,:])),2)*1.15
+    plot3d_z_lim_min = round(max(b_i[2,:]),2)*1.12
+    plot3d_z_lim_max = round(-(min(u_s[2,:])+r_si_0[2][0]),2)*1.12
+    
+    ax.set_xlim([plot3d_x_lim_min, plot3d_x_lim_max]) 
+    ax.set_ylim([plot3d_y_lim_min, plot3d_y_lim_max]) 
+    ax.set_zlim([plot3d_z_lim_min, plot3d_z_lim_max])
+    
+    ax.xaxis.set_tick_params(labelbottom=False)
+    ax.yaxis.set_tick_params(labelbottom=False)
+    ax.zaxis.set_tick_params(labelbottom=False)
+        
+    ax_, plot_ = plot_frame_new(u_s=u_s, b_i=b_i, r_si_0=r_si_0, ax=ax, scale=1, linewidths=[1,1.5])
+    
+    ax_.scatter3D(st.session_state.pivot_x_new, st.session_state.pivot_y_new, st.session_state.dist_frame_new + st.session_state.pivot_z_new, marker ='+', color='red', s=200)
+
+    st.pyplot(fig)
+    
 #     angles = np.array([[0.0], [0.0], [0.0]])
 #     linears = np.array([[0.0], [0.0], [0.0]])
 #     angles_0 = angles.copy()
@@ -404,30 +361,73 @@ with st.sidebar:
     
 #     r_si_0 = np.array([[0], [0], [-st.session_state.dist_frame_new]])
 #     r_si = r_si_0 + linears
-    fig = plt.figure(figsize=(5,5))
-    ax = plt.axes(projection='3d')
-#     ax._axis3don = False
     
-    plot3d_x_lim_min = round(min(min(u_s[0,:])+r_si_0[0][0],min(b_i[0,:])),2)*1.15
-    plot3d_x_lim_max = round(max(max(u_s[0,:])+r_si_0[0][0],max(b_i[0,:])),2)*1.15
-    plot3d_y_lim_min = round(min(min(u_s[1,:])+r_si_0[1][0],min(b_i[1,:])),2)*1.15
-    plot3d_y_lim_max = round(max(max(u_s[1,:])+r_si_0[1][0],max(b_i[1,:])),2)*1.15
-    plot3d_z_lim_min = round(max(b_i[2,:]),2)*1.12
-    plot3d_z_lim_max = round(-(min(u_s[2,:])+r_si_0[2][0]),2)*1.12
-    
-    ax.set_xlim([plot3d_x_lim_min, plot3d_x_lim_max]) 
-    ax.set_ylim([plot3d_y_lim_min, plot3d_y_lim_max]) 
-    ax.set_zlim([plot3d_z_lim_min, plot3d_z_lim_max])
-    
-    ax.xaxis.set_tick_params(labelbottom=False)
-    ax.yaxis.set_tick_params(labelbottom=False)
-    ax.zaxis.set_tick_params(labelbottom=False)
-        
-    ax_, plot_ = plot_frame_new(u_s=u_s, b_i=b_i, r_si_0=r_si_0, ax=ax, scale=1, linewidths=[1,1.5])
-    
-    ax_.scatter3D(st.session_state.pivot_x_new, st.session_state.pivot_y_new, st.session_state.dist_frame_new + st.session_state.pivot_z_new, marker ='+', color='red', s=200)
+    value_final = np.array([[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]])
+    dict_modes = {'surge':0, 'sway':1, 'heave':2, 'roll':3, 'pitch':4, 'yaw':5}
+    dict_increment = {'min':0, 'max':1}
+    act_len = np.zeros((6,6,2))
 
-    st.pyplot(fig)
+    PIV = np.array([[st.session_state.pivot_x], [st.session_state.pivot_y], [-st.session_state.pivot_z]])
+    PIV_ext = np.array([[st.session_state.pivot_x], [st.session_state.pivot_y], [st.session_state.pivot_z]]).repeat(len(u_s[0]), axis=0).reshape(-1,len(u_s[0]))
+
+    u_s_new = u_s - PIV_ext
+
+    for j in dict_increment.keys():
+
+        if j == 'min':
+            increment = -0.1
+        else:
+            increment = +0.1
+
+        for i in dict_modes.keys():
+
+            if i in {'roll', 'pitch', 'yaw'}:
+                increment /= 10
+
+            flag = True
+            value = np.array([[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]])
+
+            while flag == True:
+
+                linears = np.array([[value[dict_modes['surge']][dict_increment[j]]], [value[dict_modes['sway']][dict_increment[j]]], [-value[dict_modes['heave']][dict_increment[j]]]])
+                angles = np.array([[value[dict_modes['roll']][dict_increment[j]]], [value[dict_modes['pitch']][dict_increment[j]]], [value[dict_modes['yaw']][dict_increment[j]]]])
+#                 r_si = np.array([r_si_0[0], r_si_0[1], -r_si_0[2]]) + PIV + linears
+                r_si = r_si_0 + PIV + linears
+                actuator_lengths = np.array(actuator_length(angles, u_s_new, b_i, r_si))/st.session_state.unit
+
+                if (actuator_lengths.min() > st.session_state.minL_new/st.session_state.unit) & (actuator_lengths.max() < st.session_state.maxL_new/st.session_state.unit):    
+                    value[dict_modes[i]][dict_increment[j]] += increment
+                else:
+                    flag = False   
+
+            act_len[:,dict_modes[i],dict_increment[j]] = actuator_lengths
+            value[dict_modes[i]][dict_increment[j]] -= increment
+
+            value_final[dict_modes[i]][dict_increment[j]] = value[dict_modes[i]][dict_increment[j]]
+
+    for i in range(6):
+        if i < 3:
+            value_final[i] = value_final[i]#*100
+        else:
+            value_final[i] = value_final[i]*180/np.pi
+
+    value_final_new = value_final.copy()
+
+    value_final_new = np.round(value_final_new, 1)/st.session_state.unit
+    Admissible = pd.DataFrame(value_final_new, columns=['minimum range', 'maximum range'], index=['Surge', 'Sway', 'Heave', 'Roll', 'Pitch', 'Yaw'])
+    
+    @st.cache
+    def convert_df(df):
+        return df.to_csv().encode('utf-8')
+    
+    csv = convert_df(Admissible)
+    st.download_button(
+        "Press to Download the Results",
+        csv,
+        "output.csv",
+        "text/csv",
+        key='download-csv'
+    )
     ####
 
 if selected == 'Geometry':        
