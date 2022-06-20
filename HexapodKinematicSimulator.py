@@ -570,7 +570,10 @@ if selected == 'Results':
                 increment = +0.1
 
             for i in dict_modes.keys():
-
+                
+                if i in {'roll', 'pitch', 'yaw'}:
+                    increment /= 10
+                
                 flag = True
                 value = np.array([[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]])
 
@@ -582,7 +585,7 @@ if selected == 'Results':
                     r_si = r_si_0 + PIV + linears
                     actuator_lengths = np.array(actuator_length(angles, u_s_new, b_i, r_si))/st.session_state.unit
 
-                    if (actuator_lengths.min() > st.session_state.minL_new/st.session_state.unit) & (actuator_lengths.max() < st.session_state.maxL_new/st.session_state.unit):
+                    if (actuator_lengths.min() > st.session_state.minL_new/st.session_state.unit) & (actuator_lengths.max() < st.session_state.maxL_new/st.session_state.unit):    
                         value[dict_modes[i]][dict_increment[j]] += increment
                     else:
                         flag = False   
