@@ -98,9 +98,6 @@ def plot_frame_new(u_s, b_i, r_si_0, ax, scale=1, u_s_updated=[], linewidths=[2,
     
     return ax, plt
 
-
-
-
 with st.sidebar:
     selected = option_menu("Stewart Platform Kinematic Simulator", ["Home", 'Settings', 'Geometry', 'Results', 'Animation'], 
         icons=['house-fill', 'sliders', 'layout-wtf', 'bar-chart-fill', 'joystick'], menu_icon="cast", default_index=1)
@@ -250,7 +247,73 @@ with st.sidebar:
 
     st.pyplot(fig)
     ####
-
+    
+    uploaded_file = st.file_uploader("Choose a. XLSX file", accept_multiple_files=False)
+    if uploaded_file is not None:
+        df = pd.read_excel(uploaded_file)        
+        ind_start_upper = df.index[(pd.Series((df.iloc[i,0] == 'UPPER FRAME' and df.iloc[i+1,0] == 'X')  for i in df.index))][0] + 2
+        ind_start_lower = df.index[(pd.Series((df.iloc[i,0] == 'LOWER FRAME' and df.iloc[i+1,0] == 'X')  for i in df.index))][0] + 2
+        ind_start_actuator = df.index[(pd.Series((df.iloc[i,0] == 'ACTUATOR' and df.iloc[i+1,0] == 'MIN')  for i in df.index))][0] + 2
+        
+        df_upper = df.iloc[ind_start_upper:ind_start_upper+6,:].reset_index(drop=True)
+        df_upper = df_upper.rename(columns={df_upper.columns[0]:'X', df_upper.columns[1]:'Y', df_upper.columns[2]:'Z'})
+        df_lower = df.iloc[ind_start_lower:ind_start_lower+6,:].reset_index(drop=True)
+        df_lower = df_lower.rename(columns={df_lower.columns[0]:'X', df_lower.columns[1]:'Y', df_lower.columns[2]:'Z'})
+        df_actuator = df.iloc[ind_start_actuator:ind_start_actuator+1,:].reset_index(drop=True)
+        df_actuator = df_actuator.rename(columns={df_actuator.columns[0]:'MIN', df_actuator.columns[1]:'MAX', df_actuator.columns[2]:'FRAME DIST'})
+        st.write("UPPER FRAME")
+        st.dataframe(df_upper)
+        st.write("LOWER FRAME")
+        st.dataframe(df_lower)
+        st.write("ACTUATOR")
+        st.dataframe(df_actuator)
+        
+        st.session_state['act1_upper_x_new'] = df_upper.iloc[0][0]
+        st.session_state['act2_upper_x_new'] = df_upper.iloc[1][0]
+        st.session_state['act3_upper_x_new'] = df_upper.iloc[2][0]
+        st.session_state['act4_upper_x_new'] = df_upper.iloc[3][0]
+        st.session_state['act5_upper_x_new'] = df_upper.iloc[4][0]
+        st.session_state['act6_upper_x_new'] = df_upper.iloc[5][0]
+        
+        st.session_state['act1_upper_y_new'] = df_upper.iloc[0][1]
+        st.session_state['act2_upper_y_new'] = df_upper.iloc[1][1]
+        st.session_state['act3_upper_y_new'] = df_upper.iloc[2][1]
+        st.session_state['act4_upper_y_new'] = df_upper.iloc[3][1]
+        st.session_state['act5_upper_y_new'] = df_upper.iloc[4][1]
+        st.session_state['act6_upper_y_new'] = df_upper.iloc[5][1]
+        
+        st.session_state['act1_upper_z_new'] = df_upper.iloc[0][2]
+        st.session_state['act2_upper_z_new'] = df_upper.iloc[1][2]
+        st.session_state['act3_upper_z_new'] = df_upper.iloc[2][2]
+        st.session_state['act4_upper_z_new'] = df_upper.iloc[3][2]
+        st.session_state['act5_upper_z_new'] = df_upper.iloc[4][2]
+        st.session_state['act6_upper_z_new'] = df_upper.iloc[5][2]
+        
+        st.session_state['act1_lower_x_new'] = df_lower.iloc[0][0]
+        st.session_state['act2_lower_x_new'] = df_lower.iloc[1][0]
+        st.session_state['act3_lower_x_new'] = df_lower.iloc[2][0]
+        st.session_state['act4_lower_x_new'] = df_lower.iloc[3][0]
+        st.session_state['act5_lower_x_new'] = df_lower.iloc[4][0]
+        st.session_state['act6_lower_x_new'] = df_lower.iloc[5][0]
+        
+        st.session_state['act1_lower_y_new'] = df_lower.iloc[0][1]
+        st.session_state['act2_lower_y_new'] = df_lower.iloc[1][1]
+        st.session_state['act3_lower_y_new'] = df_lower.iloc[2][1]
+        st.session_state['act4_lower_y_new'] = df_lower.iloc[3][1]
+        st.session_state['act5_lower_y_new'] = df_lower.iloc[4][1]
+        st.session_state['act6_lower_y_new'] = df_lower.iloc[5][1]
+        
+        st.session_state['act1_lower_z_new'] = df_lower.iloc[0][2]
+        st.session_state['act2_lower_z_new'] = df_lower.iloc[1][2]
+        st.session_state['act3_lower_z_new'] = df_lower.iloc[2][2]
+        st.session_state['act4_lower_z_new'] = df_lower.iloc[3][2]
+        st.session_state['act5_lower_z_new'] = df_lower.iloc[4][2]
+        st.session_state['act6_lower_z_new'] = df_lower.iloc[5][2]
+        
+        st.session_state['minL_new'] = df_actuator.iloc[0][0]
+        st.session_state['maxL_new'] = df_actuator.iloc[0][1]
+        st.session_state['dist_frame_new'] = df_actuator.iloc[0][2]
+        
 if selected == 'Geometry':        
     
     st.header('Set the Geometry')
@@ -272,7 +335,7 @@ if selected == 'Geometry':
         col1_upper, col2_upper, col3_upper = st.columns(3)    
 
         with col1_upper:
-        
+            
 #             st.subheader('X')
             act1_upper_x = st.number_input(label='Actuator 1', value=st.session_state['act1_upper_x_new']/st.session_state.unit, step=1.0, disabled=False, key='act1_upper_x')
             act2_upper_x = st.number_input(label='Actuator 2', value=st.session_state['act2_upper_x_new']/st.session_state.unit, step=1.0, disabled=False, key='act2_upper_x')
@@ -498,9 +561,9 @@ if selected == 'Results':
         for j in dict_increment.keys():
 
             if j == 'min':
-                increment = -0.005
+                increment = -0.1
             else:
-                increment = +0.005
+                increment = +0.1
 
             for i in dict_modes.keys():
 
@@ -734,5 +797,4 @@ if selected == 'Settings':
         
     if (st.button('Reset to default', on_click=reset_settings, key='reset_settings_')):
         st.success("Changes are successfully saved!")
-        
         
