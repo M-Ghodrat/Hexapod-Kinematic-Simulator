@@ -4,5 +4,3 @@ altair
 pandas
 numpy
 matplotlib
-seaborn
-openpyxl
